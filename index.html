@@ -355,7 +355,7 @@ function getStats(arr) {
 
 function formatNum(v) {
     if (v === null || v === undefined) return '-';
-    return v.toFixed(3);
+    return v % 1 === 0 ? v.toFixed(0) : v.toFixed(3);
 }
 
 async function renderChart() {
@@ -610,7 +610,7 @@ function renderTables(allStats, headers) {
 
     function fmtVal(v) {
         if (v === null || v === undefined) return '-';
-        return v.toFixed(3);
+        return v % 1 === 0 ? v.toFixed(0) : v.toFixed(3);
     }
     function fmtPct(v) {
         if (v === null || v === undefined) return '-';
