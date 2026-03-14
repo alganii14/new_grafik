@@ -6,6 +6,7 @@
     <title>Grafik Harian DPK</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -235,6 +236,14 @@
         <label>Bulan:</label>
         <div class="tab-group" id="monthFilter" style="flex-wrap:wrap;"></div>
     </div>
+    <div class="control-group" style="margin-left:auto;">
+        <label>Label:</label>
+        <div class="tab-group" id="labelMode">
+            <button class="tab-btn active" data-label="all">Semua</button>
+            <button class="tab-btn" data-label="edge">Awal & Akhir</button>
+            <button class="tab-btn" data-label="none">Tanpa Label</button>
+        </div>
+    </div>
 </div>
 
 <div class="chart-container">
@@ -246,8 +255,8 @@
     <div class="legend-custom" id="customLegend"></div>
 </div>
 
-<div class="tables-row">
-    <div class="table-box">
+<div class="tables-row" id="tablesRow">
+    <div class="table-box" id="avgTableBox">
         <h3>Average Balance vs Ending Balance</h3>
         <table class="data-table" id="avgTable">
             <thead>
@@ -263,7 +272,7 @@
             <tbody></tbody>
         </table>
     </div>
-    <div class="table-box">
+    <div class="table-box" id="bottomTableBox">
         <h3>Bottom vs Ending Balance</h3>
         <table class="data-table" id="bottomTable">
             <thead>
@@ -279,6 +288,9 @@
             <tbody></tbody>
         </table>
     </div>
+</div>
+<div style="text-align:center;margin:0 30px 20px;">
+    <button class="tab-btn" onclick="downloadTable('tablesRow','semua_tabel')" style="padding:8px 24px;">Download Semua Tabel</button>
 </div>
 
 <script>
@@ -315,6 +327,7 @@ const FOLDER_NAMES = {
 let currentFolder = 'csv konsol';
 let currentMetric = 'tabungan';
 let selectedMonths = new Set();
+let labelMode = 'all';
 let chart = null;
 
 async function loadCSV(folder, metric) {
@@ -376,8 +389,6 @@ async function renderChart() {
     }
 
     const { headers, data } = result;
-    const maxDays = Math.max(...headers.map(h => data[h] ? data[h].length : 0));
-    const dayLabels = Array.from({ length: maxDays }, (_, i) => i + 1);
 
     // Build month filter buttons
     const availableMonths = [];
@@ -414,6 +425,15 @@ async function renderChart() {
         filterContainer.appendChild(btn);
     });
 
+    // Calculate maxDays based on last valid data point of selected months only
+    const maxDays = Math.max(...headers.filter(h => selectedMonths.has(h)).map(h => {
+        const vals = data[h];
+        if (!vals) return 0;
+        for (let i = vals.length - 1; i >= 0; i--) { if (vals[i] !== null) return i + 1; }
+        return 0;
+    }), 0);
+    const dayLabels = Array.from({ length: maxDays }, (_, i) => i + 1);
+
     const datasets = [];
     const allStats = {};
     let globalMin = Infinity, globalMinMonth = '', globalMax = -Infinity, globalMaxMonth = '';
@@ -432,11 +452,11 @@ async function renderChart() {
         const color = MONTH_COLORS[month] || { line: '#333', bg: 'rgba(51,51,51,0.1)' };
         datasets.push({
             label: MONTH_LABELS[month] || month,
-            data: vals,
+            data: vals.slice(0, maxDays),
             borderColor: color.line,
             backgroundColor: color.bg,
             borderWidth: 2.5,
-            pointRadius: 0,
+            pointRadius: 3,
             pointHoverRadius: 5,
             tension: 0.3,
             fill: false,
@@ -485,21 +505,23 @@ async function renderChart() {
                 },
                 datalabels: {
                     display: function(ctx) {
+                        if (labelMode === 'none') return false;
+                        const val = ctx.dataset.data[ctx.dataIndex];
+                        if (val === null) return false;
+                        if (labelMode === 'all') return true;
+                        // edge: show first and last valid points only
                         const ds = ctx.dataset;
                         const vals = ds.data.filter(v => v !== null);
                         if (vals.length === 0) return false;
-                        const val = ds.data[ctx.dataIndex];
-                        if (val === null) return false;
-                        // Show label on first and last valid data point
                         const firstIdx = ds.data.indexOf(vals[0]);
                         const lastIdx = ds.data.lastIndexOf(vals[vals.length - 1]);
                         return ctx.dataIndex === firstIdx || ctx.dataIndex === lastIdx;
                     },
                     color: function(ctx) { return ctx.dataset.borderColor; },
-                    font: { size: 11, weight: 'bold' },
+                    font: { size: 9, weight: 'bold' },
                     anchor: 'end',
                     align: 'top',
-                    offset: 4,
+                    offset: 2,
                     formatter: (v) => formatNum(v)
                 }
             },
@@ -706,6 +728,25 @@ document.querySelectorAll('#metricTabs .tab-btn').forEach(btn => {
         renderChart();
     });
 });
+
+document.querySelectorAll('#labelMode .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#labelMode .tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        labelMode = btn.dataset.label;
+        renderChart();
+    });
+});
+
+function downloadTable(elementId, filename) {
+    const el = document.getElementById(elementId);
+    html2canvas(el, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `${filename}_${FOLDER_NAMES[currentFolder]}_${METRIC_NAMES[currentMetric]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
 
 // Initial render
 renderChart();
