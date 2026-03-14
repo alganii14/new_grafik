@@ -247,8 +247,13 @@
 </div>
 
 <div class="chart-container">
-    <div class="chart-title" id="chartTitle">Tabungan - Konsolidasi</div>
-    <div class="chart-subtitle" id="chartSubtitle">Data harian per bulan</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+            <div class="chart-title" id="chartTitle">Tabungan - Konsolidasi</div>
+            <div class="chart-subtitle" id="chartSubtitle">Data harian per bulan</div>
+        </div>
+        <button class="tab-btn" onclick="downloadChart()" style="padding:7px 16px;white-space:nowrap;">Download Chart</button>
+    </div>
     <div class="chart-wrapper">
         <canvas id="mainChart"></canvas>
     </div>
@@ -746,6 +751,25 @@ function downloadTable(elementId, filename) {
     html2canvas(el, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = `${filename}_${FOLDER_NAMES[currentFolder]}_${METRIC_NAMES[currentMetric]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+
+function downloadChart() {
+    if (!chart) return;
+
+    // Hide title bar sementara
+    const titleBar = document.querySelector('.chart-container > div:first-child');
+    titleBar.style.display = 'none';
+
+    const el = document.querySelector('.chart-container');
+    html2canvas(el, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+        titleBar.style.display = 'flex';
+
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().slice(0,10);
+        link.download = `chart_${METRIC_NAMES[currentMetric]}_${FOLDER_NAMES[currentFolder]}_${timestamp}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
     });
