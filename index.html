@@ -616,9 +616,13 @@ function renderTables(allStats, headers) {
         if (v === null || v === undefined) return '-';
         return v.toFixed(1) + '%';
     }
+    // Check if data uses whole numbers (KCP) - look at first ending value
+    const firstStats = allStats[activeMonths[0]];
+    const isWholeNum = firstStats && firstStats.last !== null && firstStats.last % 1 === 0;
+
     function fmtMiliar(v) {
         if (v === null || v === undefined) return '<span class="val-neutral">-</span>';
-        const miliar = Math.round(v * 1000);
+        const miliar = isWholeNum ? Math.round(v) : Math.round(v * 1000);
         const arrow = miliar > 0 ? '▲' : miliar < 0 ? '▼' : '';
         const cls = miliar > 0 ? 'val-up' : miliar < 0 ? 'val-down' : 'val-neutral';
         const formatted = Math.abs(miliar).toLocaleString('id-ID');
