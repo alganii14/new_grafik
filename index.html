@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Harian DPK</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 18px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 16px 30px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .control-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+        .tab-group {
+            display: flex;
+            gap: 4px;
+        }
+        .tab-btn {
+            padding: 7px 16px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { background: #e8eaf6; }
+        .tab-btn.active {
+            background: #1a237e;
+            color: white;
+            border-color: #1a237e;
+        }
+        .month-btn {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .month-btn:hover { background: #e8eaf6; }
+        .month-btn.active {
+            color: white;
+            border-color: transparent;
+        }
+
+        .chart-container {
+            margin: 20px 30px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .chart-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 4px;
+        }
+        .chart-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 480px;
+        }
+        .info-cards {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .info-card {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            border-left: 4px solid #1a237e;
+        }
+        .info-card .label { font-size: 11px; color: #888; text-transform: uppercase; }
+        .info-card .value { font-size: 18px; font-weight: 700; color: #1a237e; margin-top: 2px; }
+        .info-card .detail { font-size: 11px; color: #666; }
+
+        .bottom-note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #fff8e1;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #f57f17;
+            border: 1px solid #ffecb3;
+        }
+
+        .legend-custom {
+            display: flex;
+            gap: 20px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .tables-row {
+            display: flex;
+            gap: 20px;
+            margin: 20px 30px;
+            flex-wrap: wrap;
+        }
+        .table-box {
+            flex: 1;
+            min-width: 420px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .table-box h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 12px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .data-table thead th {
+            background: #1a237e;
+            color: #fff;
+            padding: 8px 10px;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .data-table thead th:first-child {
+            border-radius: 6px 0 0 0;
+        }
+        .data-table thead th:last-child {
+            border-radius: 0 6px 0 0;
+        }
+        .data-table tbody td {
+            padding: 7px 10px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table tbody tr:nth-child(even) {
+            background: #f8f9ff;
+        }
+        .data-table tbody tr:hover {
+            background: #e8eaf6;
+        }
+        .val-up { color: #2e7d32; font-weight: 600; }
+        .val-down { color: #c62828; font-weight: 600; }
+        .val-neutral { color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Dashboard Grafik Harian DPK</h1>
+    <p>Monitoring Data Harian Tabungan, Giro, Deposito, CASA & DPK</p>
+</div>
+
+<div class="controls">
+    <div class="control-group">
+        <label>Kategori:</label>
+        <div class="tab-group" id="folderTabs">
+            <button class="tab-btn active" data-folder="csv konsol">Konsolidasi</button>
+            <button class="tab-btn" data-folder="csv kc only">KC Only</button>
+            <button class="tab-btn" data-folder="csv kcp only">KCP Only</button>
+            <button class="tab-btn" data-folder="csv mikro">Mikro</button>
+            <button class="tab-btn" data-folder="csv ritel">Ritel</button>
+        </div>
+    </div>
+    <div class="control-group">
+        <label>Metrik:</label>
+        <div class="tab-group" id="metricTabs">
+            <button class="tab-btn active" data-metric="tabungan">Tabungan</button>
+            <button class="tab-btn" data-metric="giro">Giro</button>
+            <button class="tab-btn" data-metric="depo">Deposito</button>
+            <button class="tab-btn" data-metric="casa">CASA</button>
+            <button class="tab-btn" data-metric="dpk">DPK</button>
+        </div>
+    </div>
+</div>
+
+<div class="controls" style="padding-top:8px;border-top:none;">
+    <div class="control-group">
+        <label>Bulan:</label>
+        <div class="tab-group" id="monthFilter" style="flex-wrap:wrap;"></div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <div class="chart-title" id="chartTitle">Tabungan - Konsolidasi</div>
+    <div class="chart-subtitle" id="chartSubtitle">Data harian per bulan</div>
+    <div class="chart-wrapper">
+        <canvas id="mainChart"></canvas>
+    </div>
+    <div class="legend-custom" id="customLegend"></div>
+</div>
+
+<div class="tables-row">
+    <div class="table-box">
+        <h3>Average Balance vs Ending Balance</h3>
+        <table class="data-table" id="avgTable">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Ending Balance</th>
+                    <th>Avg Bln</th>
+                    <th>Avg/Ending</th>
+                    <th>MTD</th>
+                    <th>YTD</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="table-box">
+        <h3>Bottom vs Ending Balance</h3>
+        <table class="data-table" id="bottomTable">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Ending Balance</th>
+                    <th>Bottom</th>
+                    <th>Bottom/Ending</th>
+                    <th>MTD</th>
+                    <th>YTD</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const MONTH_COLORS = {
+    'Des-2025': { line: '#9e9e9e', bg: 'rgba(158,158,158,0.1)' },
+    'Jan':      { line: '#1565c0', bg: 'rgba(21,101,192,0.1)' },
+    'Feb':      { line: '#e65100', bg: 'rgba(230,81,0,0.1)' },
+    'Mar':      { line: '#2e7d32', bg: 'rgba(46,125,50,0.1)' },
+    'Apr':      { line: '#6a1b9a', bg: 'rgba(106,27,154,0.1)' },
+    'May':      { line: '#c62828', bg: 'rgba(198,40,40,0.1)' },
+    'Jun':      { line: '#00838f', bg: 'rgba(0,131,143,0.1)' },
+    'Jul':      { line: '#ef6c00', bg: 'rgba(239,108,0,0.1)' },
+    'Aug':      { line: '#ad1457', bg: 'rgba(173,20,87,0.1)' },
+    'Sep':      { line: '#4527a0', bg: 'rgba(69,39,160,0.1)' },
+    'Oct':      { line: '#1b5e20', bg: 'rgba(27,94,32,0.1)' },
+    'Nov':      { line: '#ff6f00', bg: 'rgba(255,111,0,0.1)' },
+    'Dec':      { line: '#b71c1c', bg: 'rgba(183,28,28,0.1)' }
+};
+
+const MONTH_LABELS = {
+    'Des-2025': "Des '25", 'Jan': "Jan '26", 'Feb': "Feb '26", 'Mar': "Mar '26",
+    'Apr': "Apr '26", 'May': "Mei '26", 'Jun': "Jun '26", 'Jul': "Jul '26",
+    'Aug': "Ags '26", 'Sep': "Sep '26", 'Oct': "Okt '26", 'Nov': "Nov '26", 'Dec': "Des '26"
+};
+
+const METRIC_NAMES = {
+    tabungan: 'Tabungan', giro: 'Giro', depo: 'Deposito', casa: 'CASA', dpk: 'DPK'
+};
+const FOLDER_NAMES = {
+    'csv konsol': 'Konsolidasi', 'csv kc only': 'KC Only',
+    'csv kcp only': 'KCP Only', 'csv mikro': 'Mikro', 'csv ritel': 'Ritel'
+};
+
+let currentFolder = 'csv konsol';
+let currentMetric = 'tabungan';
+let selectedMonths = new Set();
+let chart = null;
+
+async function loadCSV(folder, metric) {
+    try {
+        const resp = await fetch(`${folder}/${metric}.csv`);
+        if (!resp.ok) throw new Error('File not found');
+        const text = await resp.text();
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',');
+        const data = {};
+        headers.forEach(h => { data[h.trim()] = []; });
+
+        for (let i = 1; i < lines.length; i++) {
+            const vals = lines[i].split(',');
+            headers.forEach((h, j) => {
+                const v = vals[j] ? vals[j].trim() : '';
+                data[h.trim()].push(v === '' ? null : parseFloat(v));
+            });
+        }
+        return { headers: headers.map(h => h.trim()), data };
+    } catch (e) {
+        return null;
+    }
+}
+
+function getStats(arr) {
+    const valid = arr.filter(v => v !== null && !isNaN(v));
+    if (valid.length === 0) return null;
+    const min = Math.min(...valid);
+    const max = Math.max(...valid);
+    const first = valid[0];
+    const last = valid[valid.length - 1];
+    const avg = valid.reduce((a, b) => a + b, 0) / valid.length;
+    const minIdx = arr.indexOf(min);
+    const maxIdx = arr.indexOf(max);
+    return { min, max, first, last, avg, count: valid.length, minIdx, maxIdx };
+}
+
+function formatNum(v) {
+    if (v === null || v === undefined) return '-';
+    return v.toFixed(3);
+}
+
+async function renderChart() {
+    const result = await loadCSV(currentFolder, currentMetric);
+    if (!result) {
+        document.getElementById('chartTitle').textContent = 'Data tidak tersedia';
+        document.getElementById('customLegend').innerHTML = '';
+        if (chart) { chart.destroy(); chart = null; }
+        return;
+    }
+
+    const { headers, data } = result;
+    const maxDays = Math.max(...headers.map(h => data[h] ? data[h].length : 0));
+    const dayLabels = Array.from({ length: maxDays }, (_, i) => i + 1);
+
+    // Build month filter buttons
+    const availableMonths = [];
+    headers.forEach(month => {
+        const vals = data[month];
+        const stats = getStats(vals);
+        if (stats && stats.count > 0) availableMonths.push(month);
+    });
+
+    // Initialize selectedMonths if empty or has invalid months
+    if (selectedMonths.size === 0) {
+        availableMonths.forEach(m => selectedMonths.add(m));
+    }
+
+    const filterContainer = document.getElementById('monthFilter');
+    filterContainer.innerHTML = '';
+    availableMonths.forEach(month => {
+        const btn = document.createElement('button');
+        btn.className = 'month-btn' + (selectedMonths.has(month) ? ' active' : '');
+        btn.textContent = MONTH_LABELS[month] || month;
+        const color = MONTH_COLORS[month] || { line: '#333' };
+        if (selectedMonths.has(month)) {
+            btn.style.background = color.line;
+            btn.style.borderColor = color.line;
+        }
+        btn.addEventListener('click', () => {
+            if (selectedMonths.has(month)) {
+                if (selectedMonths.size > 1) selectedMonths.delete(month);
+            } else {
+                selectedMonths.add(month);
+            }
+            renderChart();
+        });
+        filterContainer.appendChild(btn);
+    });
+
+    const datasets = [];
+    const allStats = {};
+    let globalMin = Infinity, globalMinMonth = '', globalMax = -Infinity, globalMaxMonth = '';
+
+    headers.forEach(month => {
+        const vals = data[month];
+        const stats = getStats(vals);
+        if (!stats || stats.count === 0) return;
+        allStats[month] = stats;
+
+        if (!selectedMonths.has(month)) return;
+
+        if (stats.min < globalMin) { globalMin = stats.min; globalMinMonth = month; }
+        if (stats.max > globalMax) { globalMax = stats.max; globalMaxMonth = month; }
+
+        const color = MONTH_COLORS[month] || { line: '#333', bg: 'rgba(51,51,51,0.1)' };
+        datasets.push({
+            label: MONTH_LABELS[month] || month,
+            data: vals,
+            borderColor: color.line,
+            backgroundColor: color.bg,
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            tension: 0.3,
+            fill: false,
+            spanGaps: false,
+            monthKey: month
+        });
+    });
+
+    // Title
+    document.getElementById('chartTitle').textContent =
+        `${METRIC_NAMES[currentMetric]} - ${FOLDER_NAMES[currentFolder]}`;
+    document.getElementById('chartSubtitle').textContent = 'Data harian per bulan (Rp Miliar)';
+
+    // Destroy old chart
+    if (chart) { chart.destroy(); }
+
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: dayLabels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: { top: 30, right: 60, bottom: 10, left: 10 }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 12 },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: (items) => `Hari ke-${items[0].label}`,
+                        label: (item) => {
+                            const v = item.parsed.y;
+                            return v !== null ? `${item.dataset.label}: ${formatNum(v)}` : null;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: function(ctx) {
+                        const ds = ctx.dataset;
+                        const vals = ds.data.filter(v => v !== null);
+                        if (vals.length === 0) return false;
+                        const val = ds.data[ctx.dataIndex];
+                        if (val === null) return false;
+                        // Show label on first and last valid data point
+                        const firstIdx = ds.data.indexOf(vals[0]);
+                        const lastIdx = ds.data.lastIndexOf(vals[vals.length - 1]);
+                        return ctx.dataIndex === firstIdx || ctx.dataIndex === lastIdx;
+                    },
+                    color: function(ctx) { return ctx.dataset.borderColor; },
+                    font: { size: 11, weight: 'bold' },
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 4,
+                    formatter: (v) => formatNum(v)
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Hari', font: { size: 12, weight: '600' } },
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    ticks: { font: { size: 11 } }
+                },
+                y: {
+                    title: { display: true, text: 'Rp Miliar', font: { size: 12, weight: '600' } },
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    ticks: { font: { size: 11 } }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+
+    // Custom legend
+    let legendHtml = '';
+    datasets.forEach(ds => {
+        legendHtml += `<div class="legend-item">
+            <div class="legend-dot" style="background:${ds.borderColor}"></div>
+            <span>${ds.label}</span>
+        </div>`;
+    });
+    document.getElementById('customLegend').innerHTML = legendHtml;
+
+    // Render tables
+    renderTables(allStats, headers);
+    // Render position table
+    await renderPositionTable();
+}
+
+async function renderPositionTable() {
+    const metrics = ['dpk', 'tabungan', 'giro', 'depo', 'casa'];
+    const metricLabels = {
+        dpk: 'Total Volume DPK',
+        tabungan: 'Volume Tabungan',
+        giro: 'Volume Giro',
+        depo: 'Volume Deposito',
+        casa: 'Volume Simpanan CASA'
+    };
+    const DAYS_IN_MONTH = { 'Des-2025': 31, 'Jan': 31, 'Feb': 28, 'Mar': 31, 'Apr': 30, 'May': 31, 'Jun': 30, 'Jul': 31, 'Aug': 31, 'Sep': 30, 'Oct': 31, 'Nov': 30, 'Dec': 31 };
+    const MONTH_FULL = { 'Des-2025': '-Dec-25', 'Jan': '-Jan-26', 'Feb': '-Feb-26', 'Mar': '-Mar-26', 'Apr': '-Apr-26', 'May': '-May-26', 'Jun': '-Jun-26', 'Jul': '-Jul-26', 'Aug': '-Aug-26', 'Sep': '-Sep-26', 'Oct': '-Oct-26', 'Nov': '-Nov-26', 'Dec': '-Dec-26' };
+
+    const allData = {};
+    for (const m of metrics) {
+        allData[m] = await loadCSV(currentFolder, m);
+    }
+
+    const refMetric = allData['tabungan'] || allData['dpk'];
+    if (!refMetric) {
+        document.getElementById('posHead').innerHTML = '';
+        document.getElementById('posBody').innerHTML = '';
+        return;
+    }
+
+    const { headers, data } = refMetric;
+    const dateColumns = [];
+
+    for (const month of headers) {
+        const vals = data[month];
+        if (!vals) continue;
+        const validIndices = [];
+        vals.forEach(function(v, i) { if (v !== null && !isNaN(v)) validIndices.push(i); });
+        if (validIndices.length === 0) continue;
+
+        const lastValidDay = validIndices[validIndices.length - 1] + 1;
+        const maxDays = DAYS_IN_MONTH[month] || 31;
+        const isComplete = lastValidDay >= maxDays;
+
+        if (isComplete) {
+            dateColumns.push({ month: month, dayIdx: maxDays - 1, label: maxDays + MONTH_FULL[month] });
+        } else {
+            if (validIndices.length >= 2) {
+                var prevDay = validIndices[validIndices.length - 2];
+                dateColumns.push({ month: month, dayIdx: prevDay, label: (prevDay + 1) + MONTH_FULL[month] });
+            }
+            var lastDay = validIndices[validIndices.length - 1];
+            dateColumns.push({ month: month, dayIdx: lastDay, label: (lastDay + 1) + MONTH_FULL[month] });
+        }
+    }
+
+    var headHtml = '<th>Keterangan</th>';
+    dateColumns.forEach(function(dc) { headHtml += '<th>' + dc.label + '</th>'; });
+    document.getElementById('posHead').innerHTML = headHtml;
+
+    var bodyHtml = '';
+    for (var mi = 0; mi < metrics.length; mi++) {
+        var metric = metrics[mi];
+        var md = allData[metric];
+        bodyHtml += '<tr><td style="text-align:left;font-weight:600;">' + metricLabels[metric] + '</td>';
+        for (var di = 0; di < dateColumns.length; di++) {
+            var dc = dateColumns[di];
+            var val = '-';
+            if (md && md.data[dc.month]) {
+                var v = md.data[dc.month][dc.dayIdx];
+                if (v !== null && v !== undefined && !isNaN(v)) val = formatNum(v);
+            }
+            var isLast = di === dateColumns.length - 1;
+            var style = isLast ? 'font-weight:700;color:#1a237e;' : '';
+            bodyHtml += '<td style="' + style + '">' + val + '</td>';
+        }
+        bodyHtml += '</tr>';
+    }
+    document.getElementById('posBody').innerHTML = bodyHtml;
+}
+
+function renderTables(allStats, headers) {
+    const activeMonths = headers.filter(m => allStats[m]);
+    const baseMonth = activeMonths.length > 0 ? activeMonths[0] : null;
+    const baseAvg = baseMonth ? allStats[baseMonth].avg : 0;
+    const baseBottom = baseMonth ? allStats[baseMonth].min : 0;
+
+    function fmtVal(v) {
+        if (v === null || v === undefined) return '-';
+        return v.toFixed(3);
+    }
+    function fmtPct(v) {
+        if (v === null || v === undefined) return '-';
+        return v.toFixed(1) + '%';
+    }
+    function fmtMiliar(v) {
+        if (v === null || v === undefined) return '<span class="val-neutral">-</span>';
+        const miliar = Math.round(v * 1000);
+        const arrow = miliar > 0 ? '▲' : miliar < 0 ? '▼' : '';
+        const cls = miliar > 0 ? 'val-up' : miliar < 0 ? 'val-down' : 'val-neutral';
+        const formatted = Math.abs(miliar).toLocaleString('id-ID');
+        return `<span class="${cls}">${arrow} ${formatted}</span>`;
+    }
+
+    // Average table: MTD = avg ini - avg sebelumnya, YTD = avg ini - avg Des
+    let avgHtml = '';
+    let prevAvg = null;
+    activeMonths.forEach((m, i) => {
+        const s = allStats[m];
+        const ending = s.last;
+        const avg = s.avg;
+        const avgRatio = (avg / ending) * 100;
+        const mtd = prevAvg !== null ? avg - prevAvg : null;
+        const ytd = i > 0 ? avg - baseAvg : null;
+
+        avgHtml += `<tr>
+            <td><b>${MONTH_LABELS[m] || m}</b></td>
+            <td>${fmtVal(ending)}</td>
+            <td>${fmtVal(avg)}</td>
+            <td>${fmtPct(avgRatio)}</td>
+            <td>${fmtMiliar(mtd)}</td>
+            <td>${fmtMiliar(ytd)}</td>
+        </tr>`;
+        prevAvg = avg;
+    });
+    document.querySelector('#avgTable tbody').innerHTML = avgHtml;
+
+    // Bottom table: MTD = bottom ini - bottom sebelumnya, YTD = bottom ini - bottom Des
+    let bottomHtml = '';
+    let prevBottom = null;
+    activeMonths.forEach((m, i) => {
+        const s = allStats[m];
+        const ending = s.last;
+        const bottom = s.min;
+        const bottomRatio = (bottom / ending) * 100;
+        const mtd = prevBottom !== null ? bottom - prevBottom : null;
+        const ytd = i > 0 ? bottom - baseBottom : null;
+
+        bottomHtml += `<tr>
+            <td><b>${MONTH_LABELS[m] || m}</b></td>
+            <td>${fmtVal(ending)}</td>
+            <td>${fmtVal(bottom)}</td>
+            <td>${fmtPct(bottomRatio)}</td>
+            <td>${fmtMiliar(mtd)}</td>
+            <td>${fmtMiliar(ytd)}</td>
+        </tr>`;
+        prevBottom = bottom;
+    });
+    document.querySelector('#bottomTable tbody').innerHTML = bottomHtml;
+}
+
+// Tab click handlers
+document.querySelectorAll('#folderTabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#folderTabs .tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFolder = btn.dataset.folder;
+        selectedMonths.clear();
+        renderChart();
+    });
+});
+
+document.querySelectorAll('#metricTabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#metricTabs .tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMetric = btn.dataset.metric;
+        selectedMonths.clear();
+        renderChart();
+    });
+});
+
+// Initial render
+renderChart();
+</script>
+
+</body>
+</html>
