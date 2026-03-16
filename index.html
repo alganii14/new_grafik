@@ -19,6 +19,7 @@
             color: white;
             padding: 18px 10px;
             text-align: center;
+            position: relative;
         }
         .header h1 { font-size: 22px; font-weight: 600; }
         .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
@@ -199,6 +200,213 @@
         .val-up { color: #2e7d32; font-weight: 600; }
         .val-down { color: #c62828; font-weight: 600; }
         .val-neutral { color: #888; }
+
+        /* CRUD Modal Styles */
+        .crud-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .crud-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46,125,50,0.3); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px 16px;
+            overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            border-radius: 16px 16px 0 0;
+            color: white;
+        }
+        .modal-header h2 { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.3); }
+
+        .modal-body { padding: 24px; }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 140px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+        .form-group input.auto-calc {
+            background: #e8eaf6;
+            color: #1a237e;
+            font-weight: 700;
+            border-color: #c5cae9;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+        .btn-save {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save:hover { box-shadow: 0 4px 12px rgba(26,35,126,0.3); }
+        .btn-delete {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { box-shadow: 0 4px 12px rgba(198,40,40,0.3); }
+        .btn-cancel {
+            padding: 10px 28px;
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .crud-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+        .crud-data-table thead th {
+            background: #1a237e;
+            color: #fff;
+            padding: 8px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 11px;
+        }
+        .crud-data-table thead th:first-child { border-radius: 6px 0 0 0; }
+        .crud-data-table thead th:last-child { border-radius: 0 6px 0 0; }
+        .crud-data-table tbody td {
+            padding: 6px 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .crud-data-table tbody tr:nth-child(even) { background: #f8f9ff; }
+        .crud-data-table tbody tr:hover { background: #e8eaf6; cursor: pointer; }
+        .crud-data-table tbody tr.selected { background: #c5cae9; }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
+        }
+        .toast.success { background: linear-gradient(135deg, #43a047, #2e7d32); }
+        .toast.error { background: linear-gradient(135deg, #e53935, #c62828); }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+        .section-divider {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 20px 0 8px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e8eaf6;
+        }
     </style>
 </head>
 <body>
@@ -206,6 +414,7 @@
 <div class="header">
     <h1>Dashboard Grafik Harian DPK</h1>
     <p>Monitoring Data Harian Tabungan, Giro, Deposito, CASA & DPK</p>
+    <button class="crud-btn" onclick="openCrudModal()" style="position:absolute;right:20px;top:18px;">✏️ Input Data</button>
 </div>
 
 <div class="controls">
@@ -296,6 +505,95 @@
 </div>
 <div style="text-align:center;margin:0 10px 20px;">
     <button class="tab-btn" onclick="downloadTable('tablesRow','semua_tabel')" style="padding:8px 24px;">Download Semua Tabel</button>
+</div>
+
+<!-- CRUD Modal -->
+<div class="modal-overlay" id="crudModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>✏️ Input / Edit Data CSV</h2>
+            <button class="modal-close" onclick="closeCrudModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="crudFolder" onchange="onCrudFolderChange()">
+                        <option value="csv konsol">Konsolidasi</option>
+                        <option value="csv kc only">KC Only</option>
+                        <option value="csv kcp only">KCP Only</option>
+                        <option value="csv mikro">Mikro</option>
+                        <option value="csv ritel">Ritel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Bulan</label>
+                    <select id="crudMonth" onchange="onCrudMonthChange()">
+                        <option value="Des-2025">Des 2025</option>
+                        <option value="Jan">Jan 2026</option>
+                        <option value="Feb">Feb 2026</option>
+                        <option value="Mar" selected>Mar 2026</option>
+                        <option value="Apr">Apr 2026</option>
+                        <option value="May">Mei 2026</option>
+                        <option value="Jun">Jun 2026</option>
+                        <option value="Jul">Jul 2026</option>
+                        <option value="Aug">Ags 2026</option>
+                        <option value="Sep">Sep 2026</option>
+                        <option value="Oct">Okt 2026</option>
+                        <option value="Nov">Nov 2026</option>
+                        <option value="Dec">Des 2026</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hari</label>
+                    <select id="crudDay"></select>
+                </div>
+            </div>
+
+            <div class="section-divider">Input Data (isi manual)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tabungan</label>
+                    <input type="text" id="crudTabungan" placeholder="0" oninput="calcCasaDpk()">
+                </div>
+                <div class="form-group">
+                    <label>Giro</label>
+                    <input type="text" id="crudGiro" placeholder="0" oninput="calcCasaDpk()">
+                </div>
+                <div class="form-group">
+                    <label>Deposito</label>
+                    <input type="text" id="crudDepo" placeholder="0" oninput="calcCasaDpk()">
+                </div>
+            </div>
+
+            <div class="section-divider">Otomatis (CASA & DPK)</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CASA (Tabungan + Giro)</label>
+                    <input type="text" id="crudCasa" class="auto-calc" readonly>
+                </div>
+                <div class="form-group">
+                    <label>DPK (CASA + Deposito)</label>
+                    <input type="text" id="crudDpk" class="auto-calc" readonly>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-save" onclick="saveCrudData()">💾 Simpan</button>
+                <button class="btn-delete" onclick="deleteCrudData()">🗑️ Hapus Hari Ini</button>
+                <button class="btn-cancel" onclick="closeCrudModal()">Batal</button>
+                <button class="btn-save" onclick="loadExistingData()" style="margin-left:auto;background:linear-gradient(135deg,#00838f,#006064);">🔄 Muat Data</button>
+            </div>
+
+            <div class="section-divider" style="margin-top:24px;">Data Bulan Ini</div>
+            <div style="overflow-x:auto;">
+                <table class="crud-data-table" id="crudDataTable">
+                    <thead><tr id="crudTableHead"></tr></thead>
+                    <tbody id="crudTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -777,6 +1075,261 @@ function downloadChart() {
 
 // Initial render
 renderChart();
+
+// ===== CRUD FUNCTIONS =====
+let crudCacheData = null;
+
+function openCrudModal() {
+    document.getElementById('crudModal').classList.add('active');
+    // Populate day select
+    const daySelect = document.getElementById('crudDay');
+    daySelect.innerHTML = '';
+    for (let i = 1; i <= 31; i++) {
+        daySelect.innerHTML += `<option value="${i}">${i}</option>`;
+    }
+    // Set folder to match current dashboard selection
+    document.getElementById('crudFolder').value = currentFolder;
+    loadCrudTable();
+}
+
+function closeCrudModal() {
+    document.getElementById('crudModal').classList.remove('active');
+}
+
+function onCrudFolderChange() {
+    loadCrudTable();
+}
+function onCrudMonthChange() {
+    loadCrudTable();
+}
+
+function parseKCPValue(str) {
+    // KCP tabungan/casa/dpk: "2.070" means 2070 (dot = thousands)
+    if (!str || str.trim() === '') return 0;
+    return parseFloat(str.replace(/\./g, ''));
+}
+
+function parseStdValue(str) {
+    // Standard: "35.832" means 35.832
+    if (!str || str.trim() === '') return 0;
+    return parseFloat(str);
+}
+
+function calcCasaDpk() {
+    const folder = document.getElementById('crudFolder').value;
+    const isKCP = folder === 'csv kcp only';
+
+    const tabStr = document.getElementById('crudTabungan').value;
+    const giroStr = document.getElementById('crudGiro').value;
+    const depoStr = document.getElementById('crudDepo').value;
+
+    let tabNum, giroNum, depoNum;
+    if (isKCP) {
+        tabNum = parseKCPValue(tabStr);
+        giroNum = parseFloat(giroStr) || 0;
+        depoNum = parseFloat(depoStr) || 0;
+    } else {
+        tabNum = parseFloat(tabStr) || 0;
+        giroNum = parseFloat(giroStr) || 0;
+        depoNum = parseFloat(depoStr) || 0;
+    }
+
+    const casa = tabNum + giroNum;
+    const dpk = casa + depoNum;
+
+    if (isKCP) {
+        document.getElementById('crudCasa').value = casa.toLocaleString('id-ID');
+        document.getElementById('crudDpk').value = dpk.toLocaleString('id-ID');
+    } else {
+        document.getElementById('crudCasa').value = casa.toFixed(3);
+        document.getElementById('crudDpk').value = dpk.toFixed(3);
+    }
+}
+
+async function loadCrudTable() {
+    const folder = document.getElementById('crudFolder').value;
+    const month = document.getElementById('crudMonth').value;
+
+    try {
+        const resp = await fetch(`api.php?action=read&folder=${encodeURIComponent(folder)}`);
+        const json = await resp.json();
+        if (!json.success) {
+            showToast('Gagal memuat data: ' + (json.error || ''), 'error');
+            return;
+        }
+        crudCacheData = json.data;
+        renderCrudTable(folder, month);
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    }
+}
+
+function renderCrudTable(folder, month) {
+    const headEl = document.getElementById('crudTableHead');
+    const bodyEl = document.getElementById('crudTableBody');
+    headEl.innerHTML = '<th>Hari</th><th>Tabungan</th><th>Giro</th><th>Deposito</th><th>CASA</th><th>DPK</th>';
+
+    if (!crudCacheData) {
+        bodyEl.innerHTML = '<tr><td colspan="6">Tidak ada data</td></tr>';
+        return;
+    }
+
+    const metrics = ['tabungan', 'giro', 'depo', 'casa', 'dpk'];
+    // Find max rows across all metrics
+    let maxRows = 0;
+    metrics.forEach(m => {
+        if (crudCacheData[m] && crudCacheData[m].data) {
+            maxRows = Math.max(maxRows, crudCacheData[m].data.length);
+        }
+    });
+
+    let html = '';
+    for (let i = 0; i < maxRows; i++) {
+        const vals = {};
+        let hasData = false;
+        metrics.forEach(m => {
+            const mData = crudCacheData[m];
+            if (mData && mData.data && mData.data[i]) {
+                const v = mData.data[i][month] || '';
+                vals[m] = v;
+                if (v !== '') hasData = true;
+            } else {
+                vals[m] = '';
+            }
+        });
+        if (!hasData) continue;
+
+        html += `<tr onclick="selectCrudRow(${i+1},'${vals.tabungan}','${vals.giro}','${vals.depo}')">
+            <td><b>${i+1}</b></td>
+            <td>${vals.tabungan || '-'}</td>
+            <td>${vals.giro || '-'}</td>
+            <td>${vals.depo || '-'}</td>
+            <td>${vals.casa || '-'}</td>
+            <td>${vals.dpk || '-'}</td>
+        </tr>`;
+    }
+
+    if (!html) {
+        html = '<tr><td colspan="6" style="color:#888;">Belum ada data untuk bulan ini</td></tr>';
+    }
+    bodyEl.innerHTML = html;
+}
+
+function selectCrudRow(day, tabungan, giro, depo) {
+    document.getElementById('crudDay').value = day;
+    document.getElementById('crudTabungan').value = tabungan;
+    document.getElementById('crudGiro').value = giro;
+    document.getElementById('crudDepo').value = depo;
+    calcCasaDpk();
+
+    // Highlight selected row
+    document.querySelectorAll('.crud-data-table tbody tr').forEach(tr => tr.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+}
+
+async function loadExistingData() {
+    const folder = document.getElementById('crudFolder').value;
+    const month = document.getElementById('crudMonth').value;
+    const day = parseInt(document.getElementById('crudDay').value);
+
+    if (!crudCacheData) await loadCrudTable();
+    if (!crudCacheData) return;
+
+    const rowIdx = day - 1;
+    const metrics = ['tabungan', 'giro', 'depo'];
+    const fields = ['crudTabungan', 'crudGiro', 'crudDepo'];
+
+    metrics.forEach((m, i) => {
+        const mData = crudCacheData[m];
+        let val = '';
+        if (mData && mData.data && mData.data[rowIdx]) {
+            val = mData.data[rowIdx][month] || '';
+        }
+        document.getElementById(fields[i]).value = val;
+    });
+
+    calcCasaDpk();
+    showToast(`Data hari ${day} dimuat`, 'success');
+}
+
+async function saveCrudData() {
+    const folder = document.getElementById('crudFolder').value;
+    const month = document.getElementById('crudMonth').value;
+    const day = parseInt(document.getElementById('crudDay').value);
+    const tabungan = document.getElementById('crudTabungan').value.trim();
+    const giro = document.getElementById('crudGiro').value.trim();
+    const depo = document.getElementById('crudDepo').value.trim();
+
+    if (!tabungan && !giro && !depo) {
+        showToast('Isi minimal satu field!', 'error');
+        return;
+    }
+
+    try {
+        const resp = await fetch('api.php?action=save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder, month, day, tabungan, giro, depo })
+        });
+        const json = await resp.json();
+        if (json.success) {
+            showToast(`✅ Data hari ${day} berhasil disimpan!`, 'success');
+            await loadCrudTable();
+            renderChart(); // Refresh dashboard chart
+        } else {
+            showToast('Gagal: ' + (json.error || ''), 'error');
+        }
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    }
+}
+
+async function deleteCrudData() {
+    const folder = document.getElementById('crudFolder').value;
+    const month = document.getElementById('crudMonth').value;
+    const day = parseInt(document.getElementById('crudDay').value);
+
+    if (!confirm(`Hapus data hari ${day} bulan ${month} di ${FOLDER_NAMES[folder]}?`)) return;
+
+    try {
+        const resp = await fetch('api.php?action=delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder, month, day })
+        });
+        const json = await resp.json();
+        if (json.success) {
+            showToast(`🗑️ Data hari ${day} berhasil dihapus!`, 'success');
+            document.getElementById('crudTabungan').value = '';
+            document.getElementById('crudGiro').value = '';
+            document.getElementById('crudDepo').value = '';
+            document.getElementById('crudCasa').value = '';
+            document.getElementById('crudDpk').value = '';
+            await loadCrudTable();
+            renderChart();
+        } else {
+            showToast('Gagal: ' + (json.error || ''), 'error');
+        }
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+    }
+}
+
+function showToast(msg, type) {
+    const existing = document.querySelectorAll('.toast');
+    existing.forEach(el => el.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('crudModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCrudModal();
+});
 </script>
 
 </body>
