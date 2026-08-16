@@ -1,0 +1,5 @@
+.vercel/
+.env
+.env.*
+storage/security/*.json
+storage/security/*.log*

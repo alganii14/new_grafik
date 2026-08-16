@@ -1,0 +1,6 @@
+.git
+.vercel
+.vscode
+.env
+.env.*
+storage/security/**

@@ -1,0 +1,26 @@
+DirectoryIndex index.php
+Options -Indexes
+ServerSignature Off
+FileETag None
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} !^(GET|POST|HEAD)$
+    RewriteRule ^ - [R=405,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(csv|env|ini|log|lock|sql|bak|dist|json)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^(auth|persistent_storage)\.php$">
+    Require all denied
+</FilesMatch>

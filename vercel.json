@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.6.2",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/index.php" },
+    { "source": "/index.php", "destination": "/api/index.php" },
+    { "source": "/login.php", "destination": "/api/login.php" },
+    { "source": "/logout.php", "destination": "/api/logout.php" },
+    { "source": "/data.php", "destination": "/api/data.php" },
+    { "source": "/auth.php", "destination": "/api/not-found.php" },
+    { "source": "/persistent_storage.php", "destination": "/api/not-found.php" },
+    { "source": "/storage/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_konsol/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_kc_only/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_kcp_only/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_mikro/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_ritel/:path*", "destination": "/api/not-found.php" },
+    { "source": "/csv_brilink/:path*", "destination": "/api/not-found.php" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}
