@@ -7,29 +7,30 @@
       "maxDuration": 30
     }
   },
-  "rewrites": [
-    { "source": "/", "destination": "/api/index.php" },
-    { "source": "/index.php", "destination": "/api/index.php" },
-    { "source": "/login.php", "destination": "/api/login.php" },
-    { "source": "/logout.php", "destination": "/api/logout.php" },
-    { "source": "/data.php", "destination": "/api/data.php" },
-    { "source": "/auth.php", "destination": "/api/not-found.php" },
-    { "source": "/persistent_storage.php", "destination": "/api/not-found.php" },
-    { "source": "/storage/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_konsol/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_kc_only/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_kcp_only/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_mikro/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_ritel/:path*", "destination": "/api/not-found.php" },
-    { "source": "/csv_brilink/:path*", "destination": "/api/not-found.php" }
-  ],
-  "headers": [
+  "routes": [
+    { "src": "^/$", "dest": "/api/index.php" },
+    { "src": "^/index\\.php$", "dest": "/api/index.php" },
+    { "src": "^/login\\.php$", "dest": "/api/login.php" },
+    { "src": "^/logout\\.php$", "dest": "/api/logout.php" },
+    { "src": "^/data\\.php$", "dest": "/api/data.php" },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    }
+      "src": "^/(?:auth|persistent_storage)\\.php$",
+      "dest": "/api/not-found.php"
+    },
+    {
+      "src": "^/(?:storage|csv_konsol|csv_kc_only|csv_kcp_only|csv_mikro|csv_ritel|csv_brilink)(?:/.*)?$",
+      "dest": "/api/not-found.php"
+    },
+    { "src": "^/(?!api/).*\\.php$", "dest": "/api/not-found.php" },
+    {
+      "src": "^/assets/(.*)$",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/api/not-found.php" }
   ]
 }
